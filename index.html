@@ -1,0 +1,73 @@
+<html>
+    <head>
+
+    </head>
+    <script src="https://koda.nu/simple.js">
+
+        let floor = 100
+        
+        let playerVector = [0,0]
+        let gravity = 1
+        let position = [400,520]
+
+        let inAir = false
+
+        updatesPerSecond = 100
+        let tick = 0
+
+        function update(){
+            clearScreen()
+
+            tick++
+            if (tick === 9){
+                tick = 0
+                playerVector[1] += gravity
+            }
+
+
+            if (position[1]+80 >= 600 && playerVector[1] > 0){
+                playerVector[1] = 0
+                position[1] = 520
+                inAir = false
+            }
+
+
+
+
+
+
+            if (keyboard.d && keyboard.shift && playerVector[0] < 6){
+                playerVector[0] += 3
+            } else if (keyboard.d && playerVector[0] < 3){
+                playerVector[0] += 1.5
+            }
+            if (keyboard.a && keyboard.shift && playerVector[0] > -6){
+                playerVector[0] -= 3
+            } else if (keyboard.a && playerVector[0] > -3){
+                playerVector[0] -= 1.5
+            }
+
+            if (position[1] === 520 && playerVector[1] === 0){
+                if (playerVector[0] <= -1 && !keyboard.a){
+                    playerVector[0] += 0.16
+                } else if (playerVector[0] >= 1 && !keyboard.d){
+                    playerVector[0] -= 0.16
+                } else if ((-1 < playerVector[0] && playerVector[0] < 1) && !(keyboard.a || keyboard.d)){
+                    playerVector[0] = 0
+                }
+            }
+
+            if (keyboard.space && !inAir){
+                playerVector[1] = -5
+                inAir = true
+            }
+
+
+            position = [position[0] + playerVector[0], position[1] + playerVector[1]]
+
+            rectangle(position[0],position[1], 40, 80, "red")
+            rectangle(0, 600, 1900, 100, "black")
+        }
+
+    </script>
+</html>
