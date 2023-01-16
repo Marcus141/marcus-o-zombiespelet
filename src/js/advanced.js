@@ -1382,10 +1382,10 @@ function RoboroTurtle(startX, startY, canvas)
   this.pushPosition = function() 
   { 
     this.positionStack.push({x: this.x, 
-                             y: this.y, 
-                             direction: this.direction,
-                             color: this.color,
-                             width: this.width}) 
+                            y: this.y, 
+                            direction: this.direction,
+                            color: this.color,
+                            width: this.width}) 
   };
 
   this.popPosition = function() 
