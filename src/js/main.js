@@ -1,18 +1,54 @@
 let timeLastFrame = Date.now()
 let deltaTime = 0
 
+function circleCollision(object1, object2){
+    if (object1.)
+}
+
+function distanceFromCenter(object1, object2){
+    let object1Center
+    let object2Center
+    switch (object1.shape){
+        case "circle":
+            object1Center = [object1._x, object1._y]
+            break
+        case "rectangle":
+            object1Center = [(object1.width/2) + object1.x,
+                            (object1.hight/2) + object1.y]
+    switch (object2.shape){
+        case "circle":
+            object2Center = [object2._x, object2._y]
+            break
+        case "rectangle":
+            object2Center = [(object2.width/2) + object2.x,
+                            (object2.hight/2) + object2.y]
+    return Math.sqrt((object1.x - object2.x)**2 + (object1.y - object2.y)**2)
+
+}
 
 // Player info
 class Player{
     constructor(_x, _y){
         this.width = 40
         this.hight = 80
-        this.vector = [0, 0]
+        this.vectorX = 0
+        this.vectorY = 0
         this.x = _x
         this.y = _y
-        this.gravity = 12
+        this.gravity = 10
         this.inAir = false
         this.spaceDown = false
+        this.shape = "rectangle"
+    }
+}
+
+class circle{
+    constructor(_x, _y, _radius, _color){
+        this.x = _x
+        this.y = _y
+        this.radius = _radius
+        this.color = _color
+        this.shape = "circle"
     }
 }
 
@@ -90,7 +126,9 @@ function update(){
     player2.x += player2.vector[0]
     player2.y += player2.vector[1]
 
-    rectangle(player1.x, player1.y, player1.width, player1.hight, "red")
-    rectangle(player2.x, player2.y, player2.width, player2.hight, "blue")
-    //rectangle(0, 600, 1900, 100, "black")
+    rectangle(player1.position[0], player1.position[1], player1.dimentions[0], player1.dimentions[1], "red")
+    rectangle(0, 600, 1900, 100, "black")
+
+    circle(300, 300, 50, "blue")
+    rectangle(300, 300, 50, 50, "red")
 }
