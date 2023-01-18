@@ -1,9 +1,11 @@
 let timeLastFrame = Date.now()
 let deltaTime = 0
 
-function circleCollision(object1, object2){
-    if (object1.x){}
-}
+//function circleCollision(object1, object2){
+//    if (){
+//
+//    }
+//}
 
 
 function boxCollision(object1, object2){
@@ -32,8 +34,8 @@ function distanceFromCenter(object1, object2){
         case "rectangle":
             object2Center = [(object2.width/2) + object2.x,
                             (object2.hight/2) + object2.y]
-    return Math.sqrt(Math.abs(object1Center[0] - object2Center[0])**2 + Math.abs(object1Center[1] - object2Center[1])**2)
     }
+    return Math.sqrt(Math.abs(object1Center[0] - object2Center[0])**2 + Math.abs(object1Center[1] - object2Center[1])**2)
 }
 
 class Vector{
@@ -73,8 +75,10 @@ class Sqare{
         this.position = new Vector(_x, _y)
         this.velocity = new Vector(0, 0)
         this.acceleration = new Vector(0, 0)
+        this.accelerationConstant = 20
         this.mass = _mass
         this.shape = "rectangle"
+        this.maxSpeed = 20
     }
 }
 
@@ -86,6 +90,7 @@ class Ball{
         this.radius = _radius
         this.color = _color
         this.shape = "circle"
+        this.maxSpeed = 20
     }
 }
 
@@ -107,35 +112,29 @@ function update(){
     boxCollision(player1, player2)
     
 
-    
+
     // player acceleration
-    if (player1.magnitude <= 2){
-        switch (true){
-            case keyboard.d: player1.vectorX += 20 * deltaTime
-            case keyboard.a: player1.vectorX -= 20 * deltaTime
-            case keyboard.w: player1.vectorY -= 20 * deltaTime
-            case keyboard.s: player1.vectorY += 20 * deltaTime
-        }
-    }
-    //if (keyboard.d && player1.vectorX <  2)     {player1.vectorX += 20 * deltaTime} // right
-    //if (keyboard.a && player1.vectorX > -2)     {player1.vectorX -= 20 * deltaTime} // left
-    //if (keyboard.w && player1.vectorY > -2)     {player1.vectorY -= 20 * deltaTime} // up
-    //if (keyboard.s && player1.vectorY <  2)     {player1.vectorY += 20 * deltaTime} // down
 
-    if (keyboard.right && player2.vectorX <  2) {player2.vectorX += 20 * deltaTime} //right
-    if (keyboard.left  && player2.vectorX > -2) {player2.vectorX -= 20 * deltaTime} //left
+    
+    if (keyboard.d) {player1.acceleration.x =  20}
+    if (keyboard.a) {player1.acceleration.x = -20}
+    if (keyboard.w) {player1.acceleration.y = -20}
+    if (keyboard.s) {player1.acceleration.y =  20}
+    if (!keyboard.s && !keyboard.w && !keyboard.a && !keyboard.d) {player1.acceleration = new Vector(0, 0)}
+    
 
-    player1.vectorMagnitude()
-    player1.normalize()
-    console.log(player1.magnitude)
+    player1.velocity = player1.velocity.add(player1.acceleration)
+    player1.velocity = player1.velocity.normalize()
 
+    
+    console.log(player1.velocity)
     // calculating new position
-    player1.x += player1.vectorX
-    player1.y += player1.vectorY
+    player1.position = player1.position.add(player1.velocity)
+    player1.position = player1.position.add(player1.velocity)
 
-    player2.x += player2.vectorX
-    player2.y += player2.vectorY
+    player2.position = player2.position.add(player2.velocity)
+    player2.position = player2.position.add(player2.velocity)
 
-    rectangle(player1.x, player1.y, player1.width, player1.hight, "red")
-    rectangle(player2.x, player2.y, player2.width, player2.hight, "green")
+    rectangle(player1.position.x, player1.position.y, player1.width, player1.hight, "red")
+    rectangle(player2.position.x, player2.position.y, player2.width, player2.hight, "green")
 }
