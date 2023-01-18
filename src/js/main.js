@@ -7,6 +7,11 @@ let deltaTime = 0
 //    }
 //}
 
+function airFriction(object){
+    if (keyboard.a || keyboard.d || keyboard.d || keyboard.s) return
+    
+}
+
 
 function boxCollision(object1, object2){
     if (object2.x <= object1.x + object1.width &&
@@ -49,11 +54,11 @@ class Vector{
     subtract(vector){
         return new Vector(this.x - vector.x, this.y - vector.y)
     }
-    multiply(scalar){
+    scale(scalar){
         return new Vector(this.x * scalar, this.y * scalar)
     }
     magnitude(){
-        return Math.sqrt(this.x ** 2, this.y ** 2)
+        return Math.sqrt(this.x ** 2 + this.y ** 2)
     }
     normalize(){
         if (this.magnitude() === 0){
@@ -61,6 +66,10 @@ class Vector{
         } else {
             return new Vector(this.x / this.magnitude(), this.y / this.magnitude())
         }
+    }
+    inverse(){
+        console.log(this.scale(-1))
+        return this.scale(-1)
     }
     displayVector(_x, _y, _scalar, _thickness, _color){
         line(_x, _y, _x + this.x * _scalar, _y + this.y * _scalar, _thickness, _color)
@@ -109,22 +118,26 @@ function update(){
     timeLastFrame = Date.now()
 
 
-    boxCollision(player1, player2)
-    
-
-
-    // player acceleration
+    // player movement
 
     
     if (keyboard.d) {player1.acceleration.x =  20}
     if (keyboard.a) {player1.acceleration.x = -20}
+    if (keyboard.d && keyboard.a) {player1.acceleration.x = 0}
     if (keyboard.w) {player1.acceleration.y = -20}
     if (keyboard.s) {player1.acceleration.y =  20}
+    if (keyboard.w && keyboard.s) {player1.acceleration.y = 0}
+    
     if (!keyboard.s && !keyboard.w && !keyboard.a && !keyboard.d) {player1.acceleration = new Vector(0, 0)}
     
 
+    player1.acceleration = player1.acceleration.normalize()
+    player1.acceleration.displayVector(100, 100, 100, 2, "black")
+    
     player1.velocity = player1.velocity.add(player1.acceleration)
+    player1.velocity = player1.velocity.scale(deltaTime)
     player1.velocity = player1.velocity.normalize()
+    player1.velocity.displayVector(100, 200, 100, 2, "black")
 
     
     console.log(player1.velocity)
