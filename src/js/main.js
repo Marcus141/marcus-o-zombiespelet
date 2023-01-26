@@ -1,24 +1,77 @@
 let timeLastFrame = Date.now();
 let deltaTime = 0;
 
-function circleCollision(object1, object2) {
-	if (distanceFromCenter(object1, object2) <= object1.radius + object2.radius) {
-		console.log("yes");
-	}
+let objectList = []
+
+
+let gravityVector;
+let distanceToGround;
+function gravity(object){
+	distanceToGround = (ground.position.y - object.position.y + object.hight) / 100;
+	gravityVector = 1/(distanceToGround ** 1.1) * 6
+	object.velocity = object.velocity.deltaTimeAdd(new Vector(0, gravityVector))
 }
+
 
 function airFriction(object) {
 	object.velocity = object.velocity.deltaTimeAdd(object.velocity.scale(-2));
 }
 
-function boxCollision(object1, object2) {
-	if (
-		object2.x <= object1.x + object1.width &&
-		object1.x <= object2.x + object2.width &&
-		object2.y <= object1.y + object1.hight &&
-		object1.y <= object2.y + object2.hight
-	){
 
+function circleCollision(object1, object2) {
+	if (distanceFromCenter(object1, object2) <= object1.radius + object2.radius) {
+		console.log("yes");
+	}
+}
+let tempCenter;
+function movableBoxCollision(object1, object2) {
+	if (
+		object2.position.x <= object1.position.x + object1.width &&
+		object1.position.x <= object2.position.x + object2.width &&
+		object2.position.y <= object1.position.y + object1.hight &&
+		object1.position.y <= object2.position.y + object2.hight
+	){
+		
+	}
+}
+function imovableBoxCollision(object1, object2) {
+	if (object2.position.x <= object1.position.x + object1.width &&
+		object1.position.x <= object2.position.x + object2.width &&
+		object2.position.y <= object1.position.y + object1.hight &&
+		object1.position.y <= object2.position.y + object2.hight
+	){
+		//if (keyboard.w && object1.velocity.y === 0) return;
+
+		if (object1.y + object1.hight >= object2.y &&
+			object1.y <= object2.y + object2.hight &&
+			object1.x <= object2.x
+			){
+				object1.position.x = object2.position.x - object1.width
+				console.log("1")
+			}
+		if (object1.x + object1.width >= object2.x &&
+			object1.x <= object2.x + object2.width &&
+			object1.y <= object2.y){
+				
+				//object1.position.y = object2.position.y - object1.hight
+				//object1.velocity = object1.velocity.y = 0
+				console.log("2")
+			}
+		if (object1.y + object1.hight >= object2.y &&
+			object1.y <= object2.y + object2.hight &&
+			object1.x + object1.width >= object2.x + object2.width
+			){
+				object1.position.x = object2.position.x + object2.width
+				console.log("3")
+			}
+		if (object1.x <= object2.x + object2.width &&
+			object1.x + object1.width >= object2.x &&
+			object1.y >= object2.y + object2.hight
+			){
+				object1.position.y = object2.position.y + object1.hight
+				console.log("4")
+			}
+		console.log("No")
 	}
 }
 
@@ -93,9 +146,9 @@ class Vector {
 	}
 }
 class Sqare {
-	constructor(_x, _y, _mass) {
-		this.width = 40;
-		this.hight = 80;
+	constructor(_x, _y, _width, _hight, _mass) {
+		this.width = _width;
+		this.hight = _hight;
 		this.position = new Vector(_x, _y);
 		this.velocity = new Vector(0, 0);
 		this.acceleration = new Vector(0, 0);
@@ -116,9 +169,13 @@ class Ball {
 	}
 }
 
-let player1 = new Sqare(400, 400);
+let player1 = new Sqare(400, 400, 40, 80);
 
-let player2 = new Sqare(600, 400);
+let player2 = new Sqare(600, 400, 40, 80);
+
+let ground = new Sqare(0, 600, 1500, 100)
+
+objectList.push(player1, player2, ground)
 
 function update() {
 	clearScreen();
@@ -145,39 +202,49 @@ function update() {
 	}
 
 	//Displays player vectors and 
-	player1.acceleration.displayVector(100, 100, 100, 2, "black");
+	player1.acceleration.displayVector(player1.position.x + player1.width/2, player1.position.y + player1.hight/2, 100, 2, "black");
 
 	player1.acceleration = player1.acceleration.scale(4);
 	player1.velocity = player1.velocity.deltaTimeAdd(player1.acceleration);
 
-	player1.velocity.displayVector(100, 200, 100, 2, "black");
-
-
-
+	
+	
+	
 	
 	airFriction(player1);
-
-
-
+	gravity(player1)
+	imovableBoxCollision(player1, ground)
+	
+	
+	
 	// calculating new position
 	player1.position = player1.position.add(player1.velocity);
 	player1.position = player1.position.add(player1.velocity);
-
+	
 	player2.position = player2.position.add(player2.velocity);
 	player2.position = player2.position.add(player2.velocity);
-
+	
 	rectangle(
 		player1.position.x,
 		player1.position.y,
 		player1.width,
 		player1.hight,
 		"red"
-	);
+		);
 	rectangle(
 		player2.position.x,
 		player2.position.y,
 		player2.width,
 		player2.hight,
 		"green"
-	);
-}
+		);
+	rectangle(
+		ground.position.x,
+		ground.position.y,
+		ground.width,
+		ground.hight,
+		"black"
+	)
+	
+	player1.velocity.displayVector(player1.position.x + player1.width/2, player1.position.y + player1.hight/2, 100, 2, "blue");
+	}
