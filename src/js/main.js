@@ -34,8 +34,19 @@ function distanceToLineSegment(p1, p2, q) {
 		let projection = p1.add(u.scale(t));
 		return q.subtract(projection).length();
 	}
-	
 }
+
+function findClosestLine(lineList, q) {
+	let closestDistance = Infinity;
+	for (let i = 0; i < lineList.length; i++) {
+		let p1 = lineList[i][0];
+		let p2 = lineList[i][1];
+		let distance = distanceToLineSegment(p1, p2, q);
+		closestDistance = Math.min(closestDistance, distance);
+	}
+	return closestDistance;
+}
+
 
 
 function circleCollision(object1, object2) {
@@ -120,7 +131,7 @@ class Vector2 {
 		return new Vector2(this.x * scalar, this.y * scalar);
 	}
 
-	length() {
+	magnitude() {
 		return Math.sqrt(this.dot(this));
 	}
 	normalize() {
@@ -143,6 +154,53 @@ class Vector2 {
 	
 	dot(v) {
 		return this.x * v.x + this.y * v.y;
+	}
+}
+
+
+const screenWidth = 1920;
+const screenHeight = 1080;
+const maxRayLength = 1000;	
+class Ray2D {
+	// Define a 2D ray starting from a given position and pointing in a certain direction
+	constructor(position, direction) {
+		this.position = position;
+		this.direction = direction.normalize();
+	}
+
+	// Check for intersection with a line segment and return the intersection point if found
+	intersect(line) {
+		let [p1, p2] = line;
+		let q = this.position;
+		let u = p2.subtract(p1);
+		let v = q.subtract(p1);	
+		let dotProduct = u.dot(v);
+		let uLengthSquared = u.dot(u);
+		let t = dotProduct / uLengthSquared;	
+
+		if (t < 0 || t > 1) {
+			return null;
+		} else {
+			let intersection = p1.add(u.scale(t));
+			return intersection;
+		}
+	}
+
+	// Trace the ray and return the closest intersection with any line segment
+	trace(lines) {
+		let closestIntersection = null;
+		let closestDistance = maxRayLength;
+		for (let line of lines) {
+			let intersection = this.intersect(line);
+			if (intersection) {
+				let distance = this.position.subtract(intersection).magnitude();
+				if (distance < closestDistance) {
+					closestIntersection = intersection;
+					closestDistance = distance;
+				}
+			}
+		}
+		return closestIntersection;
 	}
 }
 
@@ -170,6 +228,37 @@ class Ball {
 	}
 }
 
+//class material{
+//	constructor(_material){
+//		switch (_material){
+//			case "glass":
+//				this.heatCap = 
+//				thsi.expansionCoefficient = 
+//				this.density =
+//				this.condutionCoefficient = 
+//
+//			case "wood":
+//				this.heatCap = 
+//				thsi.expansionCoefficient = 
+//				this.density =
+//				this.condutionCoefficient = 
+//
+//			case "steel":
+//				this.heatCap = 
+//				thsi.expansionCoefficient = 
+//				this.density =
+//				this.condutionCoefficient = 
+//
+//			case "copper":
+//				this.heatCap = 
+//				thsi.expansionCoefficient = 
+//				this.density =
+//				this.condutionCoefficient = 
+//
+//		}
+//	}
+//}
+
 let player1 = new Sqare(400, 400, 40, 80);
 
 let player2 = new Sqare(600, 400, 40, 80);
@@ -179,35 +268,64 @@ let ground = new Sqare(0, 600, 1500, 100)
 objectList.push(player1, player2, ground)
 
 let lineList = [
-	[
-		new Vector2(500, 400),
-		new Vector2(700, 400)
-	],
-	[
-		new Vector2(700, 400),
-		new Vector2(900, 600)
-	]
-]
+	[new Vector2(500, 400), new Vector2(700, 400)],
+	[new Vector2(700, 400), new Vector2(900, 600)],
+	[new Vector2(100, 100), new Vector2(300, 200)]
+];
+
 let lineDistance = []
 
 
 function update() {
 	clearScreen();
+	fill("black")
 
 	// Calculationg delta time
 	deltaTime = (Date.now() - timeLastFrame) / 1000;
 	timeLastFrame = Date.now();
 
-	for (let i = 0; i < lineList.length; i++){
-		line(lineList[i][0].x, lineList[i][0].y, lineList[i][1].x, lineList[i][1].y, 2, "black")
-		lineDistance.push(distanceToLineSegment(lineList[i][0], lineList[i][1], player1.position))
-		if (lineDistance.length > 2){
-			lineDistance.splice(0, 1)
-		}
+	//for (let i = 0; i < lineList.length; i++){
+	//	line(lineList[i][0].x, lineList[i][0].y, lineList[i][1].x, lineList[i][1].y, 2, "gray")
+	//	lineDistance.push(distanceToLineSegment(lineList[i][0], lineList[i][1], player1.position.add(new Vector2(20, 40))))
+	//	if (lineDistance.length > lineList.length){
+	//		lineDistance.splice(0, 1)
+	//	}
+	//}
+
+
+	circle(player1.position.x + 20, player1.position.y + 40, Math.min(lineDistance[0], lineDistance[1]), "white")
+
+
+
+
+
+	
+
+	// Create a ray starting from the center of the screen and pointing to the right
+	let rayPosition = new Vector2(screenWidth / 2, screenHeight / 2);
+	let rayDirection = new Vector2(1, 0);
+	let ray = new Ray2D(rayPosition, rayDirection);
+
+	// Trace the ray and find the closest intersection
+	let closestIntersection = ray.trace(lineList);
+	if (closestIntersection) {
+	  console.log("Closest intersection at:", closestIntersection.x, closestIntersection.y);
+	} else {
+	  console.log("No intersection found.");
 	}
 
-	circle(player1.position.x, player1.position.y, Math.min(lineDistance[0], lineDistance[1]), "black")
-	//console.log(Math.min(lineDistance))
+
+
+
+
+
+
+
+
+
+
+
+
 
 	// player movement
 	if (keyboard.d) {player1.acceleration = new Vector2( 1, 0);}
