@@ -142,14 +142,24 @@ function update() {
 
 
 	let camera = player1.position
-	let rayDirection = new Vector2(1, 1).normalize();
 	let maxSteps = 100;
 	let stepSize = 0.01;
-	let result = rayMarch(camera, rayDirection, maxSteps, stepSize);
-	line(player1.position.x, player1.position.y, rayDirection.x, rayDirection.y, 2, "white")
-	console.log(result);
-	
 
+	for (let i = 0; i < 720; i++){
+		let rayDirection = new Vector2(Math.cos(i), Math.sin(i))
+		let result = rayMarch(camera, rayDirection, maxSteps, stepSize);
+		if (result){
+			let playerToResultLength =  Math.sqrt((result.x - player1.position.x) ** 2 + (result.y - player1.position.y) ** 2)
+			if (playerToResultLength >= 500){
+				line(player1.position.x, player1.position.y, player1.position.x + (result.x - player1.position.x)/playerToResultLength * 500, player1.position.y + (result.y - player1.position.y)/playerToResultLength * 500, 1, "white")
+			} else {
+				line(player1.position.x, player1.position.y, result.x, result.y, 1, "white")
+			}
+		}
+		if (result === null){
+			line(player1.position.x, player1.position.y,player1.position.x + rayDirection.x * 500, player1.position.y + rayDirection.y * 500)
+		}
+	}
 
 
 
